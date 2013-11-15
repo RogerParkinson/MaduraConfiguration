@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+    Copyright 2010 Roger Parkinson
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations
+    under the License.
+-->
+<config>
+	<!-- the items below can be accessed using keys like wsurl.icms.getCustomer or wsurl.icms -->
+	  <ws>
+	    <jjj
+		    config-class="java.net.URL"
+		    config-factory="nz.co.senanque.madura.configuration.ConstructorBeanFactory"
+			constructor-arg="http://localhost:8080/jjj">
+		</jjj>
+	  </ws>
+	  <test>
+		  <A>XYZ</A>
+		  <B>ABC</B>
+	  </test>
+	  <test1 config-class="org.jdom.Document"
+		    config-factory="nz.co.senanque.madura.configuration.XMLBeanFactory">
+		  <A>XYZ</A>
+		  <B>ABC</B>
+	  </test1>
+	  <test2 config-class="nz.co.senanque.madura.configuration.MyTestBean"
+		    config-factory="nz.co.senanque.madura.configuration.SetterBeanFactory" a="XYZ" b="ABC"/>
+	  <component>
+	  	<sourcedir>mysourcedir</sourcedir>
+	  </component>
+	  <sampleList config-factory="nz.co.senanque.madura.configuration.ListBeanFactory" config-class="java.util.List">
+	  	<item>A</item>
+	  	<item>B</item>
+	  </sampleList>
+</config>

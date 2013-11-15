@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright 2010 Roger Parkinson
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations
+    under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:config="http://www.senanque.co.nz/madura/configuration"
+		xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+        http://www.senanque.co.nz/madura/configuration http://www.senanque.co.nz/madura/configuration/Configuration.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:component-scan base-package="nz.co.senanque.madura.configuration"/>
+	<context:annotation-config/>
+	<context:property-placeholder/>
+
+	<bean id="xmlConfiguration" class="org.apache.commons.configuration.XMLConfiguration">
+    	<constructor-arg type="java.lang.String" value="src/test/java/nz/co/senanque/madura/configuration/Config-apache.xml"/>
+    	<property name="reloadingStrategy" ref="reloadingStrategy"/>
+	</bean>
+
+	<!-- FileChangedReloadingStrategy is probably more useful but this works better in a unit test -->	
+	<bean id="reloadingStrategy" class="org.apache.commons.configuration.reloading.ManagedReloadingStrategy"/>
+	
+	<config:manager id="configuration" source="xmlConfiguration"/>
+	
+	<bean id="listener1" class="nz.co.senanque.madura.configuration.SampleListener">
+		<property name="identifier" value="test.A"/>
+	</bean>
+	
+	<config:item id="myurl" key="ws.jjj"/>
+	<config:item id="component.sourcedir" key="component.sourcedir"/>
+
+	<config:item id="component1.sourcedir" key="component.sourcedir"/>
+	<config:item id="test2" key="test2"/>
+
+	<config:item id="test1" key="test1"/>
+	<config:item id="sampleList" key="sampleList"/>
+	
+	<bean id="m" class="nz.co.senanque.madura.configuration.MyTestBean">
+		<property name="url">
+			<config:item key="ws.jjj"/>
+		</property>
+	</bean>
+
+</beans>

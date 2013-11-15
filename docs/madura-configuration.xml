@@ -1,0 +1,392 @@
+<?xml-stylesheet 
+			type="text/xsl" href="MaduraHTML.xsl"
+		?>
+
+<doc xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://maduradocs.googlecode.com/files/MaduraDoc_5.0.5.xsd">
+	<title>
+		<MainTitle>MaduraConfiguration</MainTitle>
+		<SubTitle>User Guide</SubTitle>
+		<Author>roger</Author>
+		<Revision>$Revision: 1$</Revision>
+		<image>logo.jpg</image>
+		<references>
+			<reference t="Spring Framework" url="http://www.springframework.org" />
+			<reference t="Apache Commons Configuration" url="http://commons.apache.org/configuration/" />
+		</references>
+	</title>
+	<body>
+		<process-references />
+		<process-log />
+		<h1 t="Requirements">
+			<list>
+				<le>Provide configuration information to an application in a
+					standard manner.</le>
+				<le>
+					Easily integrate Spring Framework
+					<referenceLink t="Spring Framework" />
+					beans with Apache Commons Configuration
+					<referenceLink t="Apache Commons Configuration" />
+					.
+				</le>
+				<le>Able to reload the configuration if it changes.</le>
+				<le>Able to define complex beans at a configuration level.</le>
+			</list>
+		</h1>
+		<h1 t="General Approach">
+			<p>While you can expose Spring Bean files externally this tends to
+				get clumsy and you can end up exposing more plumbing to the
+				administrator
+				tasked with editing the configuration file. Application servers allow some
+				configuration eg data sources, but less standard configuration
+				capabilities require a custom file format plus a way of finding it
+				(ie avoid hard coding a file location).
+			</p>
+			<p>Madura Configuration uses the XML files from Apache Commons
+				Configuration. ACC uses other formats but we have not yet seen a
+				need
+				to use them and they probably won't work. The XML file is located
+				using a URL fetched from JNDI. Application servers always provide a
+				way to define this much.
+			</p>
+			<p>Finally, the configuration information is able to be wired
+				directly into Spring beans as transparently as possible. This is
+				done using
+				custom Spring tags.
+			</p>
+		</h1>
+		<h1 t="Examples">
+			<h2 t="Apache configuration sample file">
+				<code><![CDATA[
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<config>
+	  <simple>
+	  	<entry>mystring</entry>
+	  <simple>
+	  <ws>
+	    <jjj
+		    config-class="java.net.URL"
+		    config-factory="nz.co.senanque.madura.configuration.ConstructorBeanFactory"
+			constructor-arg="http://localhost:8080/jjj">
+		</jjj>
+	  </ws>
+	  <test>
+		  <A>XYZ</A>
+		  <B>ABC</B>
+	  </test>
+	  <test1 config-class="org.jdom.Document"
+		    config-factory="nz.co.senanque.madura.configuration.XMLBeanFactory">
+		  <A>XYZ</A>
+		  <B>ABC</B>
+	  </test1>
+	  <test2 config-class="nz.co.senanque.madura.configuration.MyTestBean"
+		    config-factory="nz.co.senanque.madura.configuration.SetterBeanFactory" a="XYZ" b="ABC"/>
+	  <sampleList config-factory="nz.co.senanque.madura.configuration.ListBeanFactory" config-class="java.util.List">
+	  	<item>A</item>
+	  	<item>B</item>
+	  </sampleList>
+</config>
+		]]></code>
+				<p>The first item is a simple string entry. when specifying this in
+					your beans file you use the key simple.entry and
+					that will pull the value 'mystring' from this file. Spring is happy
+					enough to convert entries like this to numbers
+					if that is what they are being injected into.
+				</p>
+				<p>The next item (ws.jjj) is a URL and that has to be specified
+					using a bean factory. The ConstructorBeanFactory can be
+					used to create any object whose class takes a single string as its
+					constructor. In this case java.net.URL works fine.
+				</p>
+				<p>test and test1 show two quite different things that look similar.
+					The first is a structure that can be queried using test.A and
+					test.B
+					while the second (test1) defines a JDom document containing the XML for
+					the A and B tags. The Document can be injected into your
+					beans as required.
+				</p>
+				<p>
+					The next item (test2) defines an arbitrary object, usually a custom
+					object. It must conform to the bean specification,
+					ie it must have a null arg constructor and it must implement setters
+					and getters. The resulting bean has its properties
+					injected with the values shown next to the SetterBeanFactory. Translation
+					of the values, and finding the setters is
+					handled by
+					<courier>BeanUtils</courier>
+					so check there for the relevant rules. But this example has methods
+					setA() and setB()..
+				</p>
+				<p>
+					Finally the sampleList entry defines a list of values. This looks
+					like an untyped list but it is always a list
+					of Strings, so think of the
+					<courier>config-class</courier>
+					as
+					<courier>java.util.List&lt;STRING&gt;</courier>
+					.
+				</p>
+			</h2>
+			<h2 t="Spring Beans sample file">
+				<p>To make use of this file start with a Spring beans file that
+					looks like this:</p>
+				<code><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:config="http://www.senanque.co.nz/madura/configuration"
+		xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+        http://www.senanque.co.nz/madura/configuration http://www.senanque.co.nz/madura/configuration/Configuration.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<context:component-scan base-package="nz.co.senanque.madura.configuration"/>
+	<context:annotation-config/>
+	
+	<bean id="xmlConfiguration" class="org.apache.commons.configuration.XMLConfiguration">
+    	<constructor-arg type="java.lang.String" value="file:./test/nz/co/senanque/madura/configuration/Config-apache.xml"/>
+    	<property name="reloadingStrategy" ref="reloadingStrategy"/>
+	</bean>
+
+	<!-- FileChangedReloadingStrategy is probably more useful but this works better in a unit test -->	
+	<bean id="reloadingStrategy" class="org.apache.commons.configuration.reloading.ManagedReloadingStrategy"/>
+	
+	<config:manager id="configuration" source="xmlConfiguration"/>
+	
+	<bean id="listener1" class="nz.co.senanque.madura.configuration.SampleListener">
+		<property name="identifier" value="test.A"/>
+	</bean>
+	
+	<config:item id="myurl" key="ws.jjj"/>
+	<config:item id="component.sourcedir" key="component.sourcedir"/>
+
+	<config:item id="component1.sourcedir" key="component.sourcedir"/>
+	<config:item id="test2" key="test2"/>
+
+	<config:item id="test1" key="test1"/>
+	<config:item id="sampleList" key="sampleList"/>
+	
+	<bean id="m" class="nz.co.senanque.madura.configuration.MyTestBean">
+		<property name="url">
+			<config:item key="ws.jjj"/>
+		</property>
+	</bean>
+
+</beans>
+		]]></code>
+				<p>The file shows a bean named xmlConfiguration which loads the
+					Apache Commons Configuration file
+					defined earlier. The file is specified as a literal in this example but in
+					a production system
+					you would normally locate it via a JNDI setting.
+				</p>
+				<p>The ACC bean is specified in the config manager bean, which
+					initialises Madura Confguration.</p>
+				<p>Several item beans are defined which point to the entries in the
+					ACC file. Some are lists and some are
+					objects etc, but as long as we are injecting them into a compatible
+					property we do not have to care about what they
+					actually are.
+				</p>
+				<p>Note the last bean is being injected with a config item bean</p>
+				<h3 t="Reloading Strategy">
+					<p>
+						The reloading strategy can be any class implementing
+						<courier>org.apache.commons.configuration.reloading.ReloadingStrategy</courier>
+						.
+					</p>
+					<p>
+						ACC configurations can be reloaded various ways but the simplest
+						is to use the
+						<courier>FileChangedReloadingStrategy</courier>
+						strategy which will reload whenever the underlying file changes.
+						MaduraConfiguration detects this and tells the Spring container to
+						reload.
+					</p>
+					<p>Note that you can elect to not include the reloading if you
+						don't want to.</p>
+					<p>The configuration caches all requests, such as instantiated
+						objects etc, but this cache is
+						flushed on a reload and the file is reloaded. So if the application
+						itself caches the
+						configuration data then the reload will not be noticed and will be ineffective.
+					</p>
+				</h3>
+				<h3 t="Listeners">
+					<p>
+						You can also have the configuration bean deliver signals to
+						listeners that are auto wired into it.
+						Just define your listeners with the
+						<courier>org.apache.commons.configuration.event.ConfigurationListener</courier>
+						interface and add the
+						<courier>@Component</courier>
+						annotation to the class. You also need to
+						put it in a package referred to by:
+					</p>
+					<code><![CDATA[
+<context:component-scan base-package="nz.co.senanque.madura.configuration"/>
+		]]></code>
+					<p>The configuration bean will call each listener notifying it of
+						the change.</p>
+				</h3>
+				<h3 t="xmlConfiguration Bean">
+					<p>This bean defines the location of the configuration file. The
+						above example specifies it as a literal
+						but in production you normally want to get it from JNDI like this:
+					</p>
+					<code><![CDATA[
+<bean id="xmlConfiguration" class="org.apache.commons.configuration.XMLConfiguration">
+    	<constructor-arg type="java.net.URL" ref="configurationURL"/>
+	</bean>
+<bean id="configurationURL" class="org.springframework.jndi.JndiObjectFactoryBean">
+	<property name="jndiName" value="myConfigurationURL"/>
+</bean>
+		]]></code>
+				</h3>
+			</h2>
+		</h1>
+		<h1 t="Special Factories">
+			<h2 t="Spring Factory Beans">
+				<p>Madura Configuration includes two Spring factory beans.</p>
+				<p>
+					<courier>nz.co.senanque.madura.spring.XMLSpringFactoryBean</courier>
+					accepts a resource property specifying the location
+					of an XML file and delivers a JDOM Document object after parsing it.
+				</p>
+				<p>
+					<courier>nz.co.senanque.madura.spring.XSLSpringFactoryBean</courier>
+					accepts a resource property specifying the location
+					of an XSL file and delivers a Template object after parsing it.
+				</p>
+				<code><![CDATA[
+<bean id="choices" class="nz.co.senanque.madura.spring.XMLSpringFactoryBean">
+	<property name="resource" value="classpath:choices.xml"/>
+</bean>
+		]]></code>
+			</h2>
+			<h2 t="javax.naming.spi.ObjectFactory Beans">
+				<p>
+					These aren't actually anything to do with Spring or ACC but they
+					are often needed when setting up JNDI objects in
+					an application server. For example in GlassFish you need to create a
+					custom resource to specify the URL to your
+					Apache Configuration file and that will require you to give a URL
+					Resource factory. You use
+					<courier>nz.co.senanque.madura.jndi.URLResourceFactory</courier>
+					.
+				</p>
+				<p>
+					The second resource factory,
+					<courier>nz.co.senanque.madura.jndi.URLResourceFactory</courier>
+					, looks useful but we have yet
+					to find a use for it.
+				</p>
+			</h2>
+		</h1>
+		<a1 t="Licence">
+			<p>
+				The code specific to MaduraBundle is licenced under the Apache
+				Licence 2.0
+				<referenceLink t="Apache Licence 2.0" />
+				.
+			</p>
+			<p>The dependent products have the following licences:</p>
+			<list>
+				<ll name="slf4j">SLF4J License, V1.0</ll>
+				<ll name="Commons Configuration">Apache Software License, Version 2.0</ll>
+				<ll name="Spring Framework">Apache Software License, Version 2.0</ll>
+				<ll name="jdom">Apache Software License, Version 2.0</ll>
+			</list>
+		</a1>
+		<a1 t="Release Notes">
+			<table width="12cm">
+				<tw>12cm</tw>
+				<tr>
+					<th>3.6.0</th>
+				</tr>
+				<tr>
+					<td>Full migration to maven. Probably no functional changes.</td>
+				</tr>
+				<tr>
+					<th>3.5</th>
+				</tr>
+				<tr>
+					<td>Added pom file for maven projects.</td>
+				</tr>
+				<tr>
+					<th>3.3</th>
+				</tr>
+				<tr>
+					<td>Fixed the problem of sources never showing up in Eclipse during
+						debug.</td>
+				</tr>
+				<tr>
+					<th>3.2</th>
+				</tr>
+				<tr>
+					<td>Distributing XSD file for Spring definition. Should not be
+						needed but Eclipse prefers to get it from the net.</td>
+				</tr>
+				<tr>
+					<td>Moved dependency to spring 3.0.6. The earlier 3.0.0 libraries
+						seem to confuse ivy.</td>
+				</tr>
+				<tr>
+					<th>3.1</th>
+				</tr>
+				<tr>
+					<td>Removed unnecessary dependency on log4j</td>
+				</tr>
+				<tr>
+					<th>3.0</th>
+				</tr>
+				<tr>
+					<td>Improved the build process (again).</td>
+				</tr>
+				<tr>
+					<td>Changed the names of the tags to be more obvious.</td>
+				</tr>
+				<tr>
+					<td>Fixed a minor bug in the factory which was throwing a null
+						pointer exception on the first call. Spring
+						handled it okay but left a stack trace.
+					</td>
+				</tr>
+				<tr>
+					<td>Spring factory beans for XML and XSL now take Resources rather
+						than file locations.</td>
+				</tr>
+				<tr>
+					<td>Reworked the documentation.</td>
+				</tr>
+				<tr>
+					<th>2.7</th>
+				</tr>
+				<tr>
+					<td>Reworked the build process to work better with google code and
+						ivy roundup.</td>
+				</tr>
+				<tr>
+					<td>Added lists to configurable objects.</td>
+				</tr>
+				<tr>
+					<th>2.1-2.6</th>
+				</tr>
+				<tr>
+					<td>It took a few tries to get the ivyroundup stuff working, no
+						changes to underlying code.</td>
+				</tr>
+				<tr>
+					<th>2.5 and earlier</th>
+				</tr>
+				<tr>
+					<td>Lost in the mists of time, I'm afraid, but no live releases so
+						probably doesn't matter.</td>
+				</tr>
+			</table>
+		</a1>
+		<!-- <a1 t="TODO"> <list> <ln></ln> </list> </a1> -->
+	</body>
+
+</doc>
