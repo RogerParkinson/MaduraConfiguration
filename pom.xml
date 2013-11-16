@@ -180,6 +180,10 @@
 				<configuration>
 					<artifacts>
 						<artifact>
+							<file>${schema}</file>
+							<type>xsd</type>
+						</artifact>
+						<artifact>
 							<file>${pdf}</file>
 							<type>pdf</type>
 						</artifact>
@@ -326,6 +330,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<pdf>target/${project.artifactId}-${project.version}.pdf</pdf>
+		<schema>src/main/resources/nz/co/senanque/madura/spring/Configuration.xsd</schema>
 	</properties>
 	<description>Connects Apache Commons Configuration with Spring Beans. Useful for injecting configuration information into Spring Beans from an external configuration file.</description>
 	<organization>
