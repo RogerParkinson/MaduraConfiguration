@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>nz.co.senanque</groupId>
 	<artifactId>madura-configuration</artifactId>
-	<version>3.6.0</version>
+	<version>3.6.1-SNAPSHOT</version>
 	<name>MaduraConfiguration</name>
 	<url>https://www.madurasoftware.com</url>
 	<licenses>
@@ -348,9 +348,9 @@
 		</developer>
 	</developers>
 	<scm>
-		<url>https://github.com/RogerParkinson/MaduraConfiguration/tags/madura-configuration-3.6.0</url>
-		<connection>scm:svn:https://github.com/RogerParkinson/MaduraConfiguration/tags/madura-configuration-3.6.0</connection>
-		<developerConnection>scm:svn:https://github.com/RogerParkinson/MaduraConfiguration/tags/madura-configuration-3.6.0</developerConnection>
+		<url>https://github.com/RogerParkinson/MaduraConfiguration/trunk/</url>
+		<connection>scm:svn:https://github.com/RogerParkinson/MaduraConfiguration/trunk/</connection>
+		<developerConnection>scm:svn:https://github.com/RogerParkinson/MaduraConfiguration/trunk/</developerConnection>
 	</scm>
 	<issueManagement>
 		<url>https://github.com/RogerParkinson/MaduraConfiguration/issues</url>
