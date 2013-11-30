@@ -1,9 +1,7 @@
-<?xml-stylesheet 
-			type="text/xsl" href="MaduraHTML.xsl"
-		?>
+<?xml-stylesheet type="text/xsl" href="MaduraHTML.xsl" ?>
 
 <doc xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:noNamespaceSchemaLocation="http://maduradocs.googlecode.com/files/MaduraDoc_5.0.5.xsd">
+	xsi:noNamespaceSchemaLocation="http://oss.sonatype.org/content/repositories/releases/nz/co/senanque/maduradocs/6.0.4/maduradocs-6.0.4.xsd">
 	<title>
 		<MainTitle>MaduraConfiguration</MainTitle>
 		<SubTitle>User Guide</SubTitle>
