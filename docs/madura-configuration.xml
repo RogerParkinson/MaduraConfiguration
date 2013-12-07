@@ -307,6 +307,12 @@
 			<table width="12cm">
 				<tw>12cm</tw>
 				<tr>
+					<th>3.6.1</th>
+				</tr>
+				<tr>
+					<td>Fixed benign errors reported in XSDs by Eclipse.</td>
+				</tr>
+				<tr>
 					<th>3.6.0</th>
 				</tr>
 				<tr>
