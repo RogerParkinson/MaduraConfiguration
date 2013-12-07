@@ -21,12 +21,9 @@
 	xmlns:beans="http://www.springframework.org/schema/beans"
 	targetNamespace="http://www.senanque.co.nz/madura/configuration"
 	elementFormDefault="qualified"
-	attributeFormDefault="unqualified"
-	xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-	
+	attributeFormDefault="unqualified">	
 
-	<xsd:import namespace="http://www.springframework.org/schema/beans"/>
+ 	<xsd:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"/>
 	 <xsd:element name="item">
 		<xsd:complexType>
 			<xsd:complexContent>
